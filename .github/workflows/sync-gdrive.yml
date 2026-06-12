@@ -55,6 +55,14 @@ jobs:
           gdown --folder "https://drive.google.com/drive/folders/$FOLDER_ID" \
             --output "$TARGET_DIR"
 
+      - name: Install ffmpeg
+        run: |
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y --no-install-recommends ffmpeg
+          fi
+          ffmpeg -version | head -n 1
+
       - name: Convert audio files to mp3
         env:
           TARGET_DIR: ${{ inputs.target_dir }}
