@@ -53,8 +53,7 @@ jobs:
           fi
           mkdir -p "$TARGET_DIR"
           gdown --folder "https://drive.google.com/drive/folders/$FOLDER_ID" \
-            --output "$TARGET_DIR" \
-            --remaining-ok
+            --output "$TARGET_DIR"
 
       - name: Convert audio files to mp3
         env:
