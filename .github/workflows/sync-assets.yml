@@ -83,7 +83,7 @@ jobs:
           while IFS= read -r -d '' f; do
             out="${f%.*}.mp3"
             echo "Konvertiere: $f -> $out"
-            ffmpeg -y -hide_banner -loglevel error -i "$f" -codec:a libmp3lame -q:a 2 "$out"
+            ffmpeg -y -nostdin -hide_banner -loglevel error -i "$f" -codec:a libmp3lame -q:a 2 "$out"
             rm -- "$f"
           done
 
