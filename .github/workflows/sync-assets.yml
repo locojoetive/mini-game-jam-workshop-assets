@@ -1,10 +1,10 @@
-name: Sync Google Drive Assets
+name: Sync Assets
 
 on:
   workflow_dispatch:
     inputs:
-      folder_id:
-        description: "Google Drive Ordner-ID (leer lassen, um das Secret GDRIVE_FOLDER_ID zu verwenden)"
+      download_url:
+        description: "Download-URL für das Asset-Archiv (leer lassen, um das Secret ASSET_DOWNLOAD_URL zu verwenden)"
         required: false
         type: string
       target_dir:
@@ -15,14 +15,14 @@ on:
       commit_message:
         description: "Commit-Nachricht"
         required: false
-        default: "Sync assets from Google Drive"
+        default: "Sync assets"
         type: string
 
 permissions:
   contents: write
 
 concurrency:
-  group: sync-gdrive
+  group: sync-assets
   cancel-in-progress: false
 
 jobs:
@@ -32,28 +32,38 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install gdown
-        run: pip install gdown
-
-      - name: Download files from Google Drive
+      - name: Download and extract asset archive
         env:
-          INPUT_FOLDER_ID: ${{ inputs.folder_id }}
-          SECRET_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
+          INPUT_DOWNLOAD_URL: ${{ inputs.download_url }}
+          SECRET_DOWNLOAD_URL: ${{ secrets.ASSET_DOWNLOAD_URL }}
           TARGET_DIR: ${{ inputs.target_dir }}
         run: |
-          FOLDER_ID="${INPUT_FOLDER_ID:-$SECRET_FOLDER_ID}"
-          if [ -z "$FOLDER_ID" ]; then
-            echo "::error::Keine Ordner-ID angegeben (weder Input 'folder_id' noch Secret GDRIVE_FOLDER_ID)."
+          DOWNLOAD_URL="${INPUT_DOWNLOAD_URL:-$SECRET_DOWNLOAD_URL}"
+          if [ -z "$DOWNLOAD_URL" ]; then
+            echo "::error::Keine Download-URL angegeben (weder Input 'download_url' noch Secret ASSET_DOWNLOAD_URL)."
             exit 1
           fi
           mkdir -p "$TARGET_DIR"
-          gdown --folder "https://drive.google.com/drive/folders/$FOLDER_ID" \
-            --output "$TARGET_DIR"
+          archive="$(mktemp --suffix=.zip)"
+          extract_dir="$(mktemp -d)"
+          curl -fsSL "$DOWNLOAD_URL" -o "$archive"
+          unzip -o -q "$archive" -d "$extract_dir"
+          rm -f "$archive"
+
+          src_dir="$extract_dir/Mini Game Jam Workshop"
+          if [ ! -d "$src_dir" ]; then
+            echo "::error::Ordner 'Mini Game Jam Workshop' nicht im Archiv gefunden."
+            exit 1
+          fi
+          for folder in Audio Bilder; do
+            if [ ! -d "$src_dir/$folder" ]; then
+              echo "::error::Ordner '$folder' nicht in 'Mini Game Jam Workshop' gefunden."
+              exit 1
+            fi
+            rm -rf "${TARGET_DIR:?}/$folder"
+            cp -r "$src_dir/$folder" "$TARGET_DIR/$folder"
+          done
+          rm -rf "$extract_dir"
 
       - name: Install ffmpeg
         run: |
