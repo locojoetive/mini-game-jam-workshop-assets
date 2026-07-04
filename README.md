@@ -61,4 +61,10 @@ sit in the matching folder, and the folder names mirror the game's `Resources/`:
 | `Bilder/Linien/Linie_Zielen.png` | AimLine |
 
 Audio is always MP3 (the push script transcodes whatever students export).
+Students record SFX in GarageBand, not Sprachmemo/Voice Memos — Sprachmemo's
+1-second minimum export length is too long for short one-shots, while GarageBand
+can trim (with region snapping off) to any length, including sub-second, before
+export. The push script also auto-trims trailing silence via ffmpeg
+(`silenceremove`, -45dB); leading silence is still trimmed by hand in GarageBand,
+since a classroom is never fully silent and an auto-trim there isn't reliable.
 Reverting a bad upload = `git revert` the commit.
