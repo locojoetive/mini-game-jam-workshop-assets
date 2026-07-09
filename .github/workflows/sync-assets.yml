@@ -55,10 +55,10 @@ jobs:
             echo "::error::Ordner 'Mini Game Jam Workshop' nicht im Archiv gefunden."
             exit 1
           fi
-          for folder in Audio Bilder; do
+          for folder in Musik Bilder SoundEffekte; do
             if [ ! -d "$src_dir/$folder" ]; then
-              echo "::error::Ordner '$folder' nicht in 'Mini Game Jam Workshop' gefunden."
-              exit 1
+              echo "Ordner '$folder' nicht in 'Mini Game Jam Workshop' gefunden — überspringe."
+              continue
             fi
             rm -rf "${TARGET_DIR:?}/$folder"
             cp -r "$src_dir/$folder" "$TARGET_DIR/$folder"
