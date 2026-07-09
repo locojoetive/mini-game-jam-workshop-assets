@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>album</key>
+	<string>DeJamBer</string>
+	<key>artist</key>
+	<string>Joey Tee</string>
+	<key>composer</key>
+	<string>Joey Tee</string>
+	<key>encoding application</key>
+	<string>GarageBand for iOS 2.3.18</string>
+	<key>maxLength</key>
+	<real>0.0</real>
+	<key>settings</key>
+	<string>uncompressedQualityWAV</string>
+	<key>tempo</key>
+	<string>110</string>
+	<key>title</key>
+	<string>Spieler_Springen</string>
+	<key>video</key>
+	<false/>
+	<key>year</key>
+	<string>2026</string>
+</dict>
+</plist>
