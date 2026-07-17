@@ -11,6 +11,21 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Install psd-tools
+      shell: bash
+      run: pip install psd-tools
+
+    - name: Export PSD layers to PNG
+      shell: bash
+      env:
+        TARGET_DIR: ${{ inputs.target_dir }}
+      run: python3 "$GITHUB_ACTION_PATH/export_psd_layers.py" "$TARGET_DIR"
+
     - name: Install ffmpeg
       shell: bash
       run: |
