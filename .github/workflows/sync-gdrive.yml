@@ -52,8 +52,7 @@ jobs:
             exit 1
           fi
           mkdir -p "$TARGET_DIR"
-          gdown --folder "https://drive.google.com/drive/folders/$FOLDER_ID" \
-            --output "$TARGET_DIR"
+          python .github/actions/process-assets/download_gdrive_parallel.py "$FOLDER_ID" "$TARGET_DIR"
 
       - name: Process and commit assets
         uses: ./.github/actions/process-assets
