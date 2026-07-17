@@ -3,9 +3,10 @@
 Usage:
     python export_psd_layers.py <target_dir>
 
-Each visible top-level layer is saved as <sanitized_layer_name>.png in the
-same directory as the source PSD.  Hidden layers are skipped.  The original
-PSD file is removed after successful export.
+Each visible top-level layer is saved as <psd_name>-<layer_name>.png in the
+same directory as the source PSD.  If multiple layers share the same name,
+a numeric index is appended: <psd_name>-<layer_name>-<index>.png.
+Hidden layers are skipped.  The original PSD file is removed after export.
 """
 
 import os
@@ -29,22 +30,28 @@ def export_psd(psd_path: pathlib.Path) -> None:
     print(f"Verarbeite PSD: {psd_path}")
     psd = PSDImage.open(psd_path)
     out_dir = psd_path.parent
-    used_names: dict[str, int] = {}
+    psd_name = sanitize(psd_path.stem)
 
+    # Collect visible layers and count name occurrences
+    visible_layers = []
+    name_counts: dict[str, int] = {}
     for layer in psd:
         if not layer.is_visible():
             print(f"  Überspringe versteckte Ebene: {layer.name}")
             continue
-
         base = sanitize(layer.name)
+        visible_layers.append((layer, base))
+        name_counts[base] = name_counts.get(base, 0) + 1
 
-        # Handle name collisions
-        if base in used_names:
-            used_names[base] += 1
-            filename = f"{base}_{used_names[base]}.png"
+    # Export with index suffix only for duplicate names
+    name_indices: dict[str, int] = {}
+    for layer, base in visible_layers:
+        if name_counts[base] > 1:
+            idx = name_indices.get(base, 0)
+            name_indices[base] = idx + 1
+            filename = f"{psd_name}-{base}-{idx}.png"
         else:
-            used_names[base] = 0
-            filename = f"{base}.png"
+            filename = f"{psd_name}-{base}.png"
 
         out_path = out_dir / filename
         layer_image = layer.composite()
